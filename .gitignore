@@ -1,0 +1,35 @@
+# ==========================================
+# 1. 引擎核心临时文件 (比教程更严谨的写法)
+# ==========================================
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+Script/
+# 额外增加：处理自定义插件内部的临时文件
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
+# ==========================================
+# 2. IDE 与构建系统 (补充现代工具)
+# ==========================================
+.vscode/
+.vs/
+.idea/        # 增加：JetBrains Rider 配置文件
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.xcodeproj
+*.xcworkspace
+
+# ==========================================
+# 3. 系统与日志 (防患于未然)
+# ==========================================
+*.log
+*.tmp
+.DS_Store     # Mac 系统生成的隐藏文件
+Thumb.db      # Windows 缩略图缓存
