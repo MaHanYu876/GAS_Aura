@@ -7,7 +7,8 @@
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
-
+struct FInputActionValue;
+class UInputAction;
 /**
  * 
  */
@@ -20,8 +21,13 @@ public:
 protected:
 	// Corrected the method name to match the base class declaration
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 private:
 	UPROPERTY(EditAnywhere, Category = "input")
 	TObjectPtr<UInputMappingContext> AuraContext;
 
+	UPROPERTY(EditAnywhere, Category = "input")
+	TObjectPtr<UInputAction> MoveAction;
+private:
+	void Move(const FInputActionValue& InputActionValue);
 };
