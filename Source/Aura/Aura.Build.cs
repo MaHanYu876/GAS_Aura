@@ -8,10 +8,10 @@ public class Aura : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","GameplayAbilities" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-			"GameplayAbilities", // GAS 核心逻辑
+			
 			"GameplayTags",      // GAS 状态标签
 			"GameplayTasks"      // 解决 LNK2001 报错的关键模块 });
 
