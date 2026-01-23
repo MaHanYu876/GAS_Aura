@@ -5,6 +5,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <Player/AuraPlayerState.h>
 #include "AbilitySystemComponent.h"
+#include <Player/AuraPlayerController.h>
+#include <UI/HUD/AuraHUD.h>
 AAuraCharacter::AAuraCharacter()
 {
 	GetCharacterMovement()->bOrientRotationToMovement = true;//角色朝向自动旋转到移动方向
@@ -41,5 +43,15 @@ void AAuraCharacter::InitAbilityActorInfo()
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
+
+	//初始化HUD，只有当玩家控制器取得了ASC和AS的归属权之后，此时才能初始化HUD，传递各种参数
+	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
+	{
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+		{
+			// 调用 HUD 的初始化函数，传入核心 GAS 组件引用
+			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 
 }
