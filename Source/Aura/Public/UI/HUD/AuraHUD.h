@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	virtual void BeginPlay() override;
+	
 private:
 	//类类型限制器，在蓝图中指定用户控件类
 	UPROPERTY(EditAnywhere)

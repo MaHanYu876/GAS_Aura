@@ -14,6 +14,9 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass); 
 		// 投递包裹
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
+
+		//当widgetcontroller成功设置好属性集后，就可以订阅gas委托系统，来监听属性的变化
+		OverlayWidgetController->BindCallbacksToDependencies();
 	}
 	return OverlayWidgetController; //
 }
@@ -40,13 +43,6 @@ void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 	WidgetController->BroadcastInitialValues(); 
 
 	// 4. 显示到屏幕
-	Widget->AddToViewport();
-}
-
-void AAuraHUD::BeginPlay()
-{
-	Super::BeginPlay();
-	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
 	Widget->AddToViewport();
 }
 
