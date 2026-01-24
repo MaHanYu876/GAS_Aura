@@ -5,47 +5,58 @@
 #include "Components/SphereComponent.h"
 #include <AbilitySystemInterface.h>
 #include <AbilitySystem/AuraAttributeSet.h>
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayEffect.h"
 // Sets default values
 AAuraEffectActor::AAuraEffectActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	SetRootComponent(Mesh);
-	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
-	Sphere->SetupAttachment(GetRootComponent());
+	
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("Root")));
 }
 
-//玩家重叠该actor时，角色生命值增加25点，然后销毁该actor
-void AAuraEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OhterComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	//接口识别，将重叠的OtherActor转换为IAbilitySystemInterface类型
-	//不需要知道OtherActor的具体类型，只要它实现了IAbilitySystemInterface接口，就可以访问它的能力系统组件
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor))
-	{
-		//获取角色的属性集，并增加生命值
-		const UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(UAuraAttributeSet::StaticClass()));
-		//去掉了指针的常量性，以便修改属性集中的生命值，但这是不推荐的，正常流程是通过GameplayEffect来修改属性
-		UAuraAttributeSet* MutableAuraAttributeSet = const_cast<UAuraAttributeSet*>(AuraAttributeSet);
-		MutableAuraAttributeSet->SetHealth(AuraAttributeSet->GetHealth() + 25.f);
-		MutableAuraAttributeSet->SetMana(AuraAttributeSet->GetMana() - 25.f);
-		Destroy();
-	}
 
-
-}
-
-void AAuraEffectActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-}
 
 // Called when the game starts or when spawned
 void AAuraEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraEffectActor::OnOverlap);
-	Sphere->OnComponentEndOverlap.AddDynamic(this, &AAuraEffectActor::OnEndOverlap);
 }
+
+//将效果应用给目标
+void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{
+	// 1. 获取目标的 Ability System Component (ASC)
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+
+	if (TargetASC == nullptr) return;
+
+	// 2. 检查效果类是否有效
+	check(GameplayEffectClass);
+
+	// 3. 创建效果上下文（包含谁发起的、来源是谁等信息）
+	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);//将当前这个actor记录为效果的源头
+
+
+	// 4. 创建效果规格（Spec），这是 GE 的运行时实例
+	// 参数：效果类, 等级(Level), 上下文
+	FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContextHandle);
+	/*
+	GE类知识一个静态蓝图，只规定了这个类里面有什么(加50血)
+	EffectContext注明了这个GE类的背景信息，谁施加的（某个物品类），应用给哪个actor（玩家）
+	EffctSpec是一个运行时实例，将GE静态蓝图和EffectContext结合起来，变成一个可以应用给具体actor的实例
+	*/
+
+	// 5. 将效果应用给目标自身
+	// .Data.Get() 获取智能指针中的原始数据，* 执行解引用
+	if (EffectSpecHandle.IsValid())
+	{
+		TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	}
+}
+
 
 
 
