@@ -14,6 +14,46 @@
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
+//定义一个辅助结构体，用于一次性存储攻击源和目标的相关信息指针
+USTRUCT()
+struct FEffectProperties
+{
+	GENERATED_BODY()
+
+	FEffectProperties() {}
+
+	// 效果上下文句柄
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	// --- 源（Source）信息：谁发起的攻击？ ---
+	UPROPERTY()
+	UAbilitySystemComponent* SourceASC = nullptr;
+
+	//源目标的肉体，包含了基础信息，位置坐标等
+	UPROPERTY()
+	AActor* SourceAvatarActor = nullptr;
+
+	//源目标的肉体，包含了高级信息，动画蒙太奇等
+	UPROPERTY()
+	AController* SourceController = nullptr;
+
+	UPROPERTY()
+	ACharacter* SourceCharacter = nullptr;
+
+	// --- 目标（Target）信息：谁受到了影响？ ---
+	UPROPERTY()
+	UAbilitySystemComponent* TargetASC = nullptr;
+
+	UPROPERTY()
+	AActor* TargetAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* TargetController = nullptr;
+
+	UPROPERTY()
+	ACharacter* TargetCharacter = nullptr;
+};
 /**
  * 
  */
@@ -27,6 +67,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
 	//定义gameplay属性
 	//ReplicatedUsing = OnRep_Health 指定属性变化时调用的函数
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
@@ -56,5 +99,6 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
-
+private:
+	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 };
