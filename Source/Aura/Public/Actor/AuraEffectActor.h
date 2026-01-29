@@ -68,7 +68,8 @@ protected:
 
 	// 用于存储无限效果句柄及其对应的 ASC
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
-private:
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Apply Effect")
+	float ActorLevel = 1.0f;
 
 };

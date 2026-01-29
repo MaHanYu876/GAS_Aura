@@ -43,7 +43,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 
 	// 4. 创建效果规格（Spec），这是 GE 的运行时实例
 	// 参数：效果类, 等级(Level), 上下文
-	FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContextHandle);
+	FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, ActorLevel, EffectContextHandle);
 	/*
 	GE类知识一个静态蓝图，只规定了这个类里面有什么(加50血)
 	EffectContext注明了这个GE类的背景信息，谁施加的（某个物品类），应用给哪个actor（玩家）
