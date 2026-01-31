@@ -20,6 +20,8 @@ public:
 	AAuraCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const;
+
+	virtual void InitAbilityActorInfo();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
