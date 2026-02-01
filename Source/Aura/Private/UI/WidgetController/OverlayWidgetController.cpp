@@ -43,16 +43,22 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
+			
 			// 3. 遍历容器中的每一个标签
 			for (const FGameplayTag& Tag : AssetTags)
 			{
-				
+				// 举例：如果 Tag 是 "Message.HealthPotion"
+				// "Message.HealthPotion".MatchesTag("Message") 将返回 True
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+
 				// 格式化调试消息
 				const FString Msg = FString::Printf(TEXT("GE Tag: %s"), *Tag.ToString());
 				GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Msg);
 
 				// 通过封装好的模板函数，从数据表中查找对应的 FUIWidgetRow 数据
 				FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
+				// 通过委托将整行数据广播出去，供蓝图 UI 使用
+				MessageWidgetRowDelegate .Broadcast(*Row);
 			}
 		}
 	);
