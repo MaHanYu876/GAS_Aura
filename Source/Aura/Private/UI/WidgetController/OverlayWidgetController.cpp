@@ -40,6 +40,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 		AuraAttributeSet->GetMaxManaAttribute()).AddUObject(this, &UOverlayWidgetController::MaxManaChanged);
 
+	//订阅 GameplayEffect 资产标签变化的委托，该委托在玩家拾取物品时触发，
 	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
@@ -47,7 +48,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			// 3. 遍历容器中的每一个标签
 			for (const FGameplayTag& Tag : AssetTags)
 			{
-				// 举例：如果 Tag 是 "Message.HealthPotion"
+				// 举例：如果 Tag 是 "Message.HealthPotion"-》需要触发UI显示
 				// "Message.HealthPotion".MatchesTag("Message") 将返回 True
 				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
 
