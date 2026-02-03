@@ -80,6 +80,19 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
     // 将 Data 中的杂乱数据填入结构体中
     SetEffectProperties(Data, Props);
 
+    // 3. 针对生命值（Health）进行限制处理
+    if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+    {
+        // 从内存读取当前刚写入的值，Clamp 后再次写回基础值
+        SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+    }
+
+    // 4. 针对法力值（Mana）进行限制处理
+    if (Data.EvaluatedData.Attribute == GetManaAttribute())
+    {
+        // 同样确保法力值在 0 到最大值之间
+        SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+    }
     // 后续你可以直接使用 Props.TargetCharacter 或 Props.SourceASC 进行逻辑判断
 }
 
