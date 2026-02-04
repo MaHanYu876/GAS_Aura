@@ -10,6 +10,7 @@
 class USkeletalMeshcomponent;
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayEffect;
 UCLASS()
 class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -35,6 +36,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
+	// 允许在编辑器中选择一个 Gameplay Effect 蓝图类来定义初始属性
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	// 声明初始化函数
+	void InitializePrimaryAttributes() const;
 public:	
 	
 
