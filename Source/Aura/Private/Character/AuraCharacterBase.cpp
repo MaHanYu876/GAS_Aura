@@ -29,28 +29,31 @@ void AAuraCharacterBase::BeginPlay()
 	
 }
 
-void AAuraCharacterBase::InitializePrimaryAttributes() const
-{
-    // 1. 安全检查：确保 AbilitySystemComponent 有效
-    check(IsValid(GetAbilitySystemComponent()));
-
-    // 2. 安全检查：确保已经在编辑器里指定了默认属性的 GE 资产
-    check(DefaultPrimaryAttributes);
-
-    // 3. 创建 EffectContextHandle：它包含了效果的来源、施放者等上下文信息
-    const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-
-    // 4. 创建 EffectSpecHandle：将静态的 GE 类转换为一个可应用的实例（Spec）
-    // 这里设置 Level 为 1.0f，如果你的 GE 内部有随等级变化的曲线，这个值会生效
-    const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(DefaultPrimaryAttributes, 1.f, ContextHandle);
-
-    // 5. 应用效果：将生成的 Spec 应用给目标（即角色自己）
-    // *SpecHandle.Data.Get() 是为了获取 Spec 的原始指针并解引用
-    GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
-}
 
 void AAuraCharacterBase::InitAbilityActorInfo()
 {
 
+}
+
+void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
+{
+    // 1. 安全检查：确保 AbilitySystemComponent 有效
+    check(IsValid(GetAbilitySystemComponent()));
+    // 2. 安全检查：确保已经在编辑器里指定了默认属性的 GE 资产
+    check(GameplayEffectClass);
+    // 3. 创建 EffectContextHandle：它包含了效果的来源、施放者等上下文信息
+    const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+    // 4. 创建 EffectSpecHandle：将静态的 GE 类转换为一个可应用的实例（Spec）
+   // 这里设置 Level 为 1.0f，如果你的 GE 内部有随等级变化的曲线，这个值会生效
+    const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
+    // 5. 应用效果：将生成的 Spec 应用给目标（即角色自己）
+   // *SpecHandle.Data.Get() 是为了获取 Spec 的原始指针并解引用
+    GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+}
+
+void AAuraCharacterBase::InitializeDefaultAttributes() const
+{
+    ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
+    ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
 }
 
