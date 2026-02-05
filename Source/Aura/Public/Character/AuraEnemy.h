@@ -21,8 +21,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlighted = false;
+
+	virtual int32 GetPlayerLevel() override;
 protected:
 	virtual void BeginPlay() override;
-
 	virtual void InitAbilityActorInfo() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Default")
+	int32 Level = 1;
 };
