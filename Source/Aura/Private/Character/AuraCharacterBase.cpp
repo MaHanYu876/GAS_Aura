@@ -44,7 +44,8 @@ void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> Gameplay
     // 2. 安全检查：确保已经在编辑器里指定了默认属性的 GE 资产
     check(GameplayEffectClass);
     // 3. 创建 EffectContextHandle：它包含了效果的来源、施放者等上下文信息
-    const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+    FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
     // 4. 创建 EffectSpecHandle：将静态的 GE 类转换为一个可应用的实例（Spec）
    // 这里设置 Level 为 1.0f，如果你的 GE 内部有随等级变化的曲线，这个值会生效
     const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
