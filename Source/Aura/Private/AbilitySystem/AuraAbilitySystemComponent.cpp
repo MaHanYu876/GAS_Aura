@@ -2,10 +2,15 @@
 
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include <AuraGameplayTags.h>
 
+//该函数当确认ASC的归属信息后会被调用，通常在ASC初始化完成后，或者当ASC的拥有者发生变化时被调用。我们在这个函数中绑定了一个委托，当一个Gameplay Effect被应用到自己身上时，会触发EffectApplied函数。
 void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UAuraAbilitySystemComponent::EffectApplied);
+
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("AbilityActorInfoSet: %s"), *GameplayTags.Attributes_Secondary_Armor.ToString()));
 }
 
 void UAuraAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
