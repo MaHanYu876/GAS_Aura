@@ -4,7 +4,7 @@
 #include "UI/HUD/AuraHUD.h"
 #include "UI/Widgets/AuraUserWidget.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
-
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 //创建控件控制器，并设置相应的参数
 UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
 {
@@ -19,6 +19,23 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 		OverlayWidgetController->BindCallbacksToDependencies();
 	}
 	return OverlayWidgetController; //
+}
+
+UAttributeMenuWidgetController* AAuraHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		// 如果控制器还没被创建，则根据指定的类创建一个新对象
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+
+		// 设置控制器所需的参数（如 PlayerState, AbilitySystemComponent 等）
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+
+		// 绑定回调到数据源，以便属性变化时 UI 能自动更新
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return AttributeMenuWidgetController;
+	
 }
 
 //创建控件，设置控件的控制器，并把控件添加到屏幕上
