@@ -16,7 +16,13 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 
     check(AttributeInfo);
 
-    FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(FAuraGameplayTags::Get().Attributes_Primary_Strength);
-    Info.AttributeValue = AS->GetStrength();
-    AttributeInfoDelegate.Broadcast(Info);
+    for (auto& Pair : AS->TagsToAttributes)
+    {
+        //从Map中拿到当前 Tag，在 AttributeInfo 数据表里找到对应 UI 信息
+        FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Pair.Key);
+        //Pair.Value()等价于： GetStrengthAttribute()返回的就是：FGameplayAttribute，你必须先提供这个，让系统知道你要获取哪个属性
+        //然后再从 AttributeSet 里查值
+        Info.AttributeValue = Pair.Value().GetNumericValue(AS);
+        AttributeInfoDelegate.Broadcast(Info);
+    }
 }

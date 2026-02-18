@@ -54,6 +54,24 @@ struct FEffectProperties
 	UPROPERTY()
 	ACharacter* TargetCharacter = nullptr;
 };
+
+// typedef is specific to the FGameplayAttribute() signature, but TStaticFunPtr is generic to any signature |
+//typedef TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr FAttributeFuncPtr;
+template<class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+/*
+创建了一个模板类型别名TStaticFuncPtr，它可以接受一个函数签名FGameplayAttribute()
+TBaseStaticDelegateInstance是专门用于“静态函数”的 delegate 实现类，只是 UE 用来“包装静态函数指针类型”的类，
+实现类 = 不同函数绑定方式的完整实现（存储 + 调用 + 生命周期管理）
+为什么是静态函数？
+绑定的是：GetStrengthAttribute该函数来自ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Strength)，展开后它展开后包含：
+static FGameplayAttribute GetStrengthAttribute();
+为什么要设计成static？
+FGameplayAttribute本质上是一个“属性描述符”。它内部只是保存：FProperty* 指针，也就是说：它描述的是“Strength 这个成员变量是什么”，
+而不是“某个对象当前的 Strength 值”。所以：它不依赖具体对象。
+它有两个模板参数：T表示函数签名；FDefaultDelegateUserPolicy是策略类，控制 delegate 的行为方式，是否线程安全，支持多播等
+::FFuncPtr 只是从它里面拿出真正的函数指针类型。
+*
 /**
  * 
  */
@@ -70,6 +88,8 @@ public:
 	
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
+	
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 	//定义gameplay属性
 	//ReplicatedUsing = OnRep_Health 指定属性变化时调用的函数
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
