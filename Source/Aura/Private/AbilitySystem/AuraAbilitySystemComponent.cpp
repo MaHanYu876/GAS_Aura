@@ -13,6 +13,19 @@ void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("AbilityActorInfoSet: %s"), *GameplayTags.Attributes_Secondary_Armor.ToString()));
 }
 
+//接受一个技能数组，将其中的技能赋予角色
+void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
+{
+	for (TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+	{
+		//首先会为角色创建一个“1级 AbilityClass 技能的持有记录”。
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass,1);
+		//GiveAbility(AbilitySpec);
+		//GiveAbilityAndActivateOnce()函数将其注册到ASC并立即执行一次后移除，所以该函数适用于开局自动触发一次的能力
+		GiveAbilityAndActivateOnce(AbilitySpec);
+	}
+}
+
 void UAuraAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
 	//打印GE类的名字
