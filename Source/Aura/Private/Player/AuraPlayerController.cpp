@@ -4,8 +4,9 @@
 #include "EnhancedInputSubsystems.h" // Include the header for UEnhancedInputLocalPlayerSubsystem
 #include <EnhancedInputComponent.h>
 #include "Interaction/EnemyInterface.h"
-
-
+#include "GameplayTagContainer.h"
+#include "Input/AuraInputComponent.h"
+#include "input/AuraInputConfig.h"
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true; // Mark this actor to replicate between server and client
@@ -39,11 +40,17 @@ void AAuraPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
-	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
-	}
+	// 将默认 InputComponent 转换为我们自定义的组件类型
+	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
+
+	// 绑定常规移动逻辑
+	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+
+	// 调用模板函数，一键绑定所有在 InputConfig 中定义的技能按键
+	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
+
+
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
@@ -56,6 +63,23 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
+}
+
+
+void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	// 在屏幕上打印收到的标签，验证绑定是否成功
+	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+}
+
+void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Blue, *InputTag.ToString());
+}
+
+void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
 }
 
 //该函数用于每帧检测鼠标下的对象，并根据检测结果更新敌人高亮状态

@@ -10,6 +10,8 @@ class UInputMappingContext;
 struct FInputActionValue;
 class UInputAction;
 class IEnemyInterface;
+class UAuraInputConfig;
+struct FGameplayTag;
 /**
  * 
  */
@@ -32,9 +34,16 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "input")
 	TObjectPtr<UInputAction> MoveAction;
+
+	UPROPERTY(EditAnywhere, Category = "input")
+	TObjectPtr<UAuraInputConfig> InputConfig;
 private:
 	void Move(const FInputActionValue& InputActionValue);
-	
+
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+
 	void CursorTrace();
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
