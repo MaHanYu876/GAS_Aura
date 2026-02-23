@@ -12,6 +12,7 @@ class UInputAction;
 class IEnemyInterface;
 class UAuraInputConfig;
 struct FGameplayTag;
+class UAuraAbilitySystemComponent;
 /**
  * 
  */
@@ -37,6 +38,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "input")
 	TObjectPtr<UAuraInputConfig> InputConfig;
+
+	UPROPERTY()
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+
+
 private:
 	void Move(const FInputActionValue& InputActionValue);
 
@@ -44,6 +50,7 @@ private:
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
 
+	UAuraAbilitySystemComponent* GetASC();
 	void CursorTrace();
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;

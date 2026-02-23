@@ -7,6 +7,8 @@
 #include "GameplayTagContainer.h"
 #include "Input/AuraInputComponent.h"
 #include "input/AuraInputConfig.h"
+#include <AbilitySystem/AuraAbilitySystemComponent.h>
+#include <AbilitySystemBlueprintLibrary.h>
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true; // Mark this actor to replicate between server and client
@@ -68,19 +70,33 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	// 在屏幕上打印收到的标签，验证绑定是否成功
-	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+	// 目前仅用于调试，实际激活逻辑通常在 Held 中处理
+	// GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Blue, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagReleased(InputTag);
 }
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagHeld(InputTag);
 }
+
+//获取ASC的辅助函数
+UAuraAbilitySystemComponent* AAuraPlayerController::GetASC()
+{
+	if (AuraAbilitySystemComponent == nullptr)
+	{
+		AuraAbilitySystemComponent = Cast<UAuraAbilitySystemComponent>(
+			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn()));
+	}
+	return AuraAbilitySystemComponent;
+}
+
 
 //该函数用于每帧检测鼠标下的对象，并根据检测结果更新敌人高亮状态
 void AAuraPlayerController::CursorTrace()
